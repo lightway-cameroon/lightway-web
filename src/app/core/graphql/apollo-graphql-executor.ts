@@ -16,12 +16,14 @@ export class ApolloGraphqlExecutor implements GraphqlExecutor, CacheResetter {
     opts?: { fetchPolicy?: 'cache-first' | 'cache-and-network' | 'network-only' },
   ): Promise<Result<TData>> {
     try {
-      const res = await this.client.query<TData, TVars>({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const clientAny = this.client as any;
+      const res = await clientAny.query({
         query: doc,
         variables: vars,
-        fetchPolicy: opts?.fetchPolicy,
+        fetchPolicy: opts?.fetchPolicy === 'cache-and-network' ? 'network-only' : opts?.fetchPolicy,
       });
-      return ok(res.data);
+      return ok(res.data as TData);
     } catch (err) {
       const error = this.errorMapper ? this.errorMapper.map(err) : (err as Error);
       return fail(error as never);
@@ -33,7 +35,9 @@ export class ApolloGraphqlExecutor implements GraphqlExecutor, CacheResetter {
     vars?: TVars,
   ): Promise<Result<TData>> {
     try {
-      const res = await this.client.mutate<TData, TVars>({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const clientAny = this.client as any;
+      const res = await clientAny.mutate({
         mutation: doc,
         variables: vars,
       });

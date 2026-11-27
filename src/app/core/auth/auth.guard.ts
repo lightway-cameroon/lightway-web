@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, CanMatchFn, Router } from '@angular/router';
+import { CanActivateFn, CanMatchFn, Router, UrlSegment } from '@angular/router';
 import { SessionManager } from './session-manager';
 
-export const authGuard: CanMatchFn & CanActivateFn = async (route, segments) => {
+export const authGuard: CanMatchFn & CanActivateFn = async (route, segmentsOrSnapshot) => {
   const sessionManager = inject(SessionManager);
   const router = inject(Router);
 
@@ -13,7 +13,14 @@ export const authGuard: CanMatchFn & CanActivateFn = async (route, segments) => 
   }
 
   // Construct returnUrl
-  const returnUrl = segments ? '/' + segments.map((s) => s.path).join('/') : router.url;
+  let returnUrl: string | undefined;
+  if (Array.isArray(segmentsOrSnapshot)) {
+    returnUrl = '/' + (segmentsOrSnapshot as UrlSegment[]).map((s) => s.path).join('/');
+  } else if (segmentsOrSnapshot && 'url' in segmentsOrSnapshot) {
+    returnUrl = (segmentsOrSnapshot as { url: string }).url;
+  } else {
+    returnUrl = router.url;
+  }
 
   return router.createUrlTree(['/login'], {
     queryParams: returnUrl && returnUrl !== '/' ? { returnUrl } : undefined,

@@ -10,14 +10,11 @@ export const createRetryLink = (retryPolicy: RetryPolicy): ApolloLink => {
     );
     const clientMutationId = operation.variables?.['clientMutationId'] as string | undefined;
 
-    const executeWithRetry = (
-      observer: Parameters<Observable<unknown>['subscribe']>[0],
-    ): (() => void) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const executeWithRetry = (observer: any): (() => void) => {
       let activeSub = forward(operation).subscribe({
         next: (value) => {
-          if (typeof observer === 'object' && observer?.next) {
-            observer.next(value);
-          }
+          observer.next?.(value);
         },
         error: (err) => {
           attempt++;
@@ -35,32 +32,22 @@ export const createRetryLink = (retryPolicy: RetryPolicy): ApolloLink => {
               activeSub.unsubscribe();
               activeSub = forward(operation).subscribe({
                 next: (val) => {
-                  if (typeof observer === 'object' && observer?.next) {
-                    observer.next(val);
-                  }
+                  observer.next?.(val);
                 },
                 error: (retryErr) => {
-                  if (typeof observer === 'object' && observer?.error) {
-                    observer.error(retryErr);
-                  }
+                  observer.error?.(retryErr);
                 },
                 complete: () => {
-                  if (typeof observer === 'object' && observer?.complete) {
-                    observer.complete();
-                  }
+                  observer.complete?.();
                 },
               });
             }, delay);
           } else {
-            if (typeof observer === 'object' && observer?.error) {
-              observer.error(err);
-            }
+            observer.error?.(err);
           }
         },
         complete: () => {
-          if (typeof observer === 'object' && observer?.complete) {
-            observer.complete();
-          }
+          observer.complete?.();
         },
       });
 

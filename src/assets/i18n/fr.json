@@ -1,0 +1,67 @@
+{
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "close": "Fermer",
+    "retry": "Réessayer",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "back": "Retour",
+    "lightMode": "Mode clair",
+    "darkMode": "Mode sombre",
+    "french": "Français",
+    "english": "Anglais"
+  },
+  "errors": {
+    "NETWORK_OFFLINE": "Vous êtes hors ligne. Vérifiez votre connexion.",
+    "NETWORK": "Impossible de joindre le serveur.",
+    "TIMEOUT": "La requête a expiré. Veuillez réessayer.",
+    "UNAUTHENTICATED": "Session expirée. Veuillez vous reconnecter.",
+    "FORBIDDEN": "Accès refusé. Vous n'avez pas les autorisations nécessaires.",
+    "VALIDATION_FAILED": "Les données envoyées sont invalides.",
+    "NOT_FOUND": "La ressource demandée est introuvable.",
+    "CONFLICT": "Un conflit est survenu avec les données existantes.",
+    "RATE_LIMITED": "Trop de requêtes. Veuillez patienter un instant.",
+    "INTERNAL": "Une erreur interne est survenue.",
+    "UNKNOWN": "Une erreur inattendue est survenue."
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion à la console d'administration",
+      "subtitle": "Accédez à la plateforme de gestion Lightway",
+      "email": "Adresse courriel",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "emailRequired": "L'adresse courriel est requise.",
+      "emailInvalid": "Format de courriel invalide.",
+      "passwordRequired": "Le mot de passe est requis."
+    },
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "logout": "Déconnexion"
+  },
+  "connectivity": {
+    "offline": "Connexion réseau perdue. Fonctionnalités limitées.",
+    "limited": "Connectivité instable détectée.",
+    "restored": "Connexion réseau rétablie."
+  },
+  "layout": {
+    "appName": "Lightway Admin",
+    "nav": {
+      "accounts": "Comptes",
+      "audit": "Audit & Sécurité",
+      "profile": "Profil"
+    },
+    "forbidden": {
+      "title": "Accès non autorisé",
+      "message": "Vous n'avez pas les permissions requises pour accéder à cette page.",
+      "backToHome": "Retour à l'accueil"
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "message": "La page demandée n'existe pas ou a été déplacée.",
+      "backToHome": "Retour à l'accueil"
+    }
+  }
+}

@@ -1,44 +1,38 @@
-import { inject, InjectionToken } from '@angular/core';
-import {
-  ApolloClient,
-  from,
-  HttpLink,
-  InMemoryCache,
-  NormalizedCacheObject,
-} from '@apollo/client/core';
-import { APP_CONFIG } from '../config/app-config.token';
-import { ID_GENERATOR } from '../time/id-generator.port';
-import { CONNECTIVITY_MONITOR } from '../connectivity/connectivity-monitor.port';
+import { InjectionToken } from '@angular/core';
+import { ApolloClient, from, HttpLink, InMemoryCache } from '@apollo/client/core';
+import { AppConfig } from '../config/app-config';
+import { IdGenerator } from '../time/id-generator.port';
+import { ConnectivityMonitor } from '../connectivity/connectivity-monitor.port';
 import { SessionManager } from '../auth/session-manager';
 import { defaultRetryPolicy } from '../time/retry-policy';
-import { ERROR_MAPPER } from '../errors/error-mapper.port';
+import { ErrorMapper } from '../errors/error-mapper.port';
 import { createRequestIdLink } from './links/request-id.link';
 import { createConnectivityLink } from './links/connectivity.link';
 import { createAuthLink } from './links/auth.link';
 import { createRetryLink } from './links/retry.link';
 import { createErrorMappingLink } from './links/error-mapping.link';
 
-export const APOLLO_CLIENT = new InjectionToken<ApolloClient<NormalizedCacheObject>>(
-  'APOLLO_CLIENT',
-);
+export const APOLLO_CLIENT = new InjectionToken<ApolloClient>('APOLLO_CLIENT');
 
-export const createApolloClient = (): ApolloClient<NormalizedCacheObject> => {
-  const config = inject(APP_CONFIG);
-  const idGenerator = inject(ID_GENERATOR);
-  const connectivityMonitor = inject(CONNECTIVITY_MONITOR);
-  const sessionManager = inject(SessionManager);
-  const errorMapper = inject(ERROR_MAPPER);
+export interface CreateApolloClientOptions {
+  config: AppConfig;
+  idGenerator: IdGenerator;
+  connectivityMonitor: ConnectivityMonitor;
+  sessionManager: SessionManager;
+  errorMapper: ErrorMapper;
+}
 
-  const requestIdLink = createRequestIdLink(idGenerator);
-  const connectivityLink = createConnectivityLink(connectivityMonitor);
-  const authLink = createAuthLink(sessionManager);
+export const createApolloClient = (options: CreateApolloClientOptions): ApolloClient => {
+  const requestIdLink = createRequestIdLink(options.idGenerator);
+  const connectivityLink = createConnectivityLink(options.connectivityMonitor);
+  const authLink = createAuthLink(options.sessionManager);
   const retryLink = createRetryLink(defaultRetryPolicy);
-  const errorMappingLink = createErrorMappingLink(errorMapper);
+  const errorMappingLink = createErrorMappingLink(options.errorMapper);
 
   // TODO(persisted-queries): Implémenter les requêtes persistées avec hachage SHA-256
 
   const httpLink = new HttpLink({
-    uri: config.gatewayUrl,
+    uri: options.config.gatewayUrl,
     credentials: 'include',
     headers: {
       'apollo-require-preflight': 'true',
@@ -57,10 +51,5 @@ export const createApolloClient = (): ApolloClient<NormalizedCacheObject> => {
   return new ApolloClient({
     link,
     cache: new InMemoryCache(),
-    defaultOptions: {
-      watchQuery: {
-        errorPolicy: 'none',
-      },
-    },
   });
 };
