@@ -1,0 +1,9 @@
+# CODEOWNERS — LightWay Web
+# TODO: Remplacer les identifiants ci-dessous par les membres réels de l'équipe
+
+* @TODO_TEAM_LEAD
+/src/app/core/ @TODO_CORE_OWNER
+/src/app/features/auth/ @TODO_AUTH_OWNER
+/src/app/features/accounts/ @TODO_ACCOUNTS_OWNER
+/src/app/features/audit/ @TODO_AUDIT_OWNER
+/src/app/features/profile/ @TODO_PROFILE_OWNER
