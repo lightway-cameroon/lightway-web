@@ -1,5 +1,10 @@
 import { InjectionToken } from '@angular/core';
-import { ApolloClient, from, HttpLink, InMemoryCache } from '@apollo/client/core';
+import {
+  ApolloClient,
+  from,
+  HttpLink,
+  InMemoryCache,
+} from '@apollo/client/core';
 import { AppConfig } from '../config/app-config';
 import { IdGenerator } from '../time/id-generator.port';
 import { ConnectivityMonitor } from '../connectivity/connectivity-monitor.port';

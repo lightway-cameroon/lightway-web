@@ -1,59 +1,101 @@
-# LightwayWeb
+# Lightway Web — Console d'Administration
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.3.0.
+Console d'administration web du projet Lightway, développée avec **Angular 22** en Clean Architecture stricte (4 couches + composition de routes), **pnpm**, **Apollo Client**, **Transloco** et **Angular Material**.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Démarrage rapide
 
-```bash
-ng serve
-```
+### Prérequis
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Node.js** : `>= 22.12.0`
+- **pnpm** : `12.23.0` (défini via `packageManager`)
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Installation
 
 ```bash
-ng generate component component-name
+pnpm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Lancement en développement
 
 ```bash
-ng generate --help
+# Générer les types GraphQL et démarrer le serveur de développement local (port 4200)
+pnpm start
 ```
 
-## Building
-
-To build the project run:
+### Construction pour production
 
 ```bash
-ng build
+pnpm build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🛠️ Scripts disponibles
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+| Script              | Rôle                                                                             |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `pnpm start`        | Démarre l'application en mode développement (`ng serve`)                         |
+| `pnpm build`        | Compile l'application en mode production dans `dist/lightway-web`                |
+| `pnpm test`         | Exécute la suite de tests unitaires avec Vitest (`ng test`)                      |
+| `pnpm lint`         | Valide les règles ESLint sur le code TypeScript et gabarits                      |
+| `pnpm lint:arch`    | Vérifie l'isolation des couches et règles architecturales (`dependency-cruiser`) |
+| `pnpm format:check` | Vérifie le formatage Prettier de l'ensemble des fichiers                         |
+| `pnpm format:write` | Formate automatiquement tous les fichiers du projet avec Prettier                |
+| `pnpm codegen`      | Compile et génère les documents et types GraphQL typés (`graphql-codegen`)       |
+| `pnpm schema:sync`  | Synchronise le schéma GraphQL depuis la gateway vers `schema/schema.graphql`     |
 
-```bash
-ng test
+---
+
+## 🏗️ Architecture du projet
+
+Le projet applique une **Clean Architecture** stricte et modulaire :
+
+```
+src/app/
+├── core/                       # Services et ports transverses du noyau
+│   ├── config/                 # Configuration applicative (APP_CONFIG)
+│   ├── time/                   # Ports temporels et idempotence (CLOCK, ID_GENERATOR, RetryPolicy)
+│   ├── logging/                # Journalisation sans PII (LOGGER)
+│   ├── errors/                 # Modèle Result<T, AppError>, ErrorMapper, ErrorReporter, ErrorHandler
+│   ├── notifications/          # Toasts et notifications Material (NOTIFIER)
+│   ├── connectivity/           # Machine à états réseau (CONNECTIVITY_MONITOR)
+│   ├── auth/                   # Session, TokenStore en mémoire, AuthGateway, Guards (authGuard, roleGuard)
+│   ├── permissions/            # Rôles et permissions (PERMISSION_POLICY, HasPermissionDirective)
+│   ├── graphql/                # Apollo Client, GraphqlExecutor, CacheResetter, Pipeline de liens
+│   ├── i18n/                   # Transloco, préférences de langue
+│   └── testing/                # Faux services et utilitaires de test unitaire
+├── features/                   # Fonctionnalités métier isolées
+│   ├── accounts/               # Gestion des comptes administrateurs et modérateurs
+│   ├── audit/                  # Journal d'audit et sécurité
+│   ├── profile/                # Profil de l'utilisateur connecté
+│   ├── auth/                   # Page de connexion et réinitialisation
+│   ├── referential/            # Référentiel des lignes et arrêts (Phase 2)
+│   ├── report-moderation/      # Modération des signalements (Phase 2)
+│   └── alert-settings/         # Paramètres d'alerte (Phase 2)
+├── layout/                     # Coque principale, barre de navigation, menu utilisateur, bannière hors ligne
+└── shared/                     # Composants UI partagés, pipes, directives
 ```
 
-## Running end-to-end tests
+### Règles de dépendance
 
-For end-to-end (e2e) testing, run:
+1. **Isolation des fonctionnalités** : `features/<A>/**` ne dépend jamais de `features/<B>/**`.
+2. **Couches d'une fonctionnalité** :
+   - `domain/` : TypeScript pur (aucun import Angular/RxJS).
+   - `application/` : Cas d'utilisation applicatifs.
+   - `infrastructure/` : Adaptateurs GraphQL et mappers de données.
+   - `presentation/` : Composants et pages autonomes OnPush (aucun import direct de l'infrastructure).
+   - `*.routes.ts` : Point d'assemblage où les fournisseurs sont injectés.
+3. **Sécurité des jetons** : Aucun jeton n'est stocké dans `localStorage` ou `sessionStorage`. Le jeton d'accès est conservé en mémoire (`MemoryTokenStore`), et le renouvellement s'effectue via cookie `HttpOnly` géré par la passerelle API.
+4. **Validation de l'architecture** : La commande `pnpm lint:arch` garantit le respect continu de ces frontières via `dependency-cruiser`.
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 🌍 Environnements
 
-## Additional Resources
+Les fichiers d'environnement sont situés dans `src/environments/` :
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- `environment.ts` (ou `environment.development.ts`) : Point d'accès local (`http://localhost:4000/graphql`).
+- `environment.preprod.ts` : Environnement de recette (`https://api.preprod.lightway.cm/graphql`).
+- `environment.production.ts` : Production (`https://api.lightway.cm/graphql`).
