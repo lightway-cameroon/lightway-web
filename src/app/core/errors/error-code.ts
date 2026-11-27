@@ -1,0 +1,12 @@
+export type ErrorCode =
+  | 'NETWORK_OFFLINE'
+  | 'NETWORK'
+  | 'TIMEOUT'
+  | 'UNAUTHENTICATED'
+  | 'FORBIDDEN'
+  | 'VALIDATION_FAILED'
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'RATE_LIMITED'
+  | 'INTERNAL'
+  | 'UNKNOWN';
